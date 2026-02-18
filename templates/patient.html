@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Health Plus – Patient Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #0ea5e9; --primary-dark: #0284c7;
+      --bg: #f0f9ff; --surface: #fff; --text: #0f172a;
+      --muted: #64748b; --border: #e2e8f0;
+    }
+    body { background: var(--bg); font-family: 'Segoe UI', system-ui, sans-serif; color: var(--text); min-height: 100vh; }
+    .navbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; box-shadow: 0 1px 8px rgba(14,165,233,.08); position: sticky; top: 0; z-index: 100; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.2rem; color: var(--primary); }
+    .nav-brand svg { width: 32px; height: 32px; }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-user { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--muted); }
+    .avatar { width: 36px; height: 36px; background: linear-gradient(135deg, #0ea5e9, #06b6d4); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: .9rem; }
+    .btn-logout { padding: 7px 14px; background: transparent; border: 1.5px solid var(--border); border-radius: 8px; font-size: .85rem; color: var(--muted); cursor: pointer; text-decoration: none; transition: all .2s; }
+    .btn-logout:hover { border-color: #ef4444; color: #ef4444; }
+    .container { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 { font-size: 1.6rem; font-weight: 800; }
+    .page-header p { color: var(--muted); margin-top: 4px; }
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: var(--surface); border-radius: 12px; padding: 20px; border: 1px solid var(--border); text-align: center; }
+    .stat-card .num { font-size: 2rem; font-weight: 800; }
+    .stat-card .lbl { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-top: 4px; }
+    .stat-card.blue .num { color: #0ea5e9; }
+    .stat-card.amber .num { color: #f59e0b; }
+    .stat-card.green .num { color: #10b981; }
+    .two-col { display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: start; }
+    .card { background: var(--surface); border-radius: 14px; border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(0,0,0,.04); }
+    .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: .95rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .card-body { padding: 20px; }
+    .profile-item { margin-bottom: 14px; }
+    .profile-item:last-child { margin-bottom: 0; }
+    .profile-item .lbl { font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+    .profile-item .val { font-size: .92rem; font-weight: 500; margin-top: 2px; }
+    .profile-item .val.empty { color: #cbd5e1; font-style: italic; font-weight: 400; }
+    /* Session list */
+    .session-card { border: 1.5px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; cursor: pointer; transition: box-shadow .2s, border-color .2s; }
+    .session-card:hover { box-shadow: 0 4px 16px rgba(14,165,233,.12); border-color: #bae6fd; }
+    .session-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; }
+    .session-title { font-weight: 700; font-size: .95rem; }
+    .session-meta { font-size: .78rem; color: var(--muted); margin-top: 3px; }
+    .session-right { display: flex; align-items: center; gap: 10px; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 11px; border-radius: 999px; font-size: .75rem; font-weight: 700; white-space: nowrap; }
+    .badge.pending { background: #fef9c3; color: #92400e; }
+    .badge.administered { background: #d1fae5; color: #065f46; }
+    .badge.rejected { background: #fee2e2; color: #b91c1c; }
+    .chevron { color: var(--muted); transition: transform .2s; font-size: .85rem; }
+    .session-body { display: none; border-top: 1px solid var(--border); padding: 14px 18px; background: #f8fafc; }
+    .session-body.open { display: block; }
+    .drug-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .drug-row:last-child { border-bottom: none; }
+    .drug-icon { font-size: 1rem; }
+    .drug-name { font-weight: 600; font-size: .88rem; flex: 1; }
+    .drug-dosage { font-size: .78rem; color: var(--muted); background: #f1f5f9; padding: 2px 8px; border-radius: 5px; }
+    .note-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 12px; font-size: .82rem; color: #92400e; margin-top: 12px; }
+    .note-box.pharma { background: #f0fdf4; border-color: #86efac; color: #166534; }
+    .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .messages { margin-bottom: 20px; }
+    .msg { padding: 10px 14px; border-radius: 8px; font-size: .875rem; margin-bottom: 8px; }
+    .msg.success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+    .msg.error { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    @media(max-width:700px) { .two-col { grid-template-columns: 1fr; } .stats-row { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-brand">
+    <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#0ea5e9"/><path d="M13 9h6v4h4v6h-4v4h-6v-4H9v-6h4z" fill="white"/></svg>
+    Health Plus
+  </div>
+  <div class="nav-right">
+    <div class="nav-user">
+      <div class="avatar">{{ user.first_name.0|upper }}{{ user.last_name.0|upper }}</div>
+      <div>
+        <div style="font-weight:600;color:var(--text)">{{ user.full_name }}</div>
+        <div style="font-size:.78rem">Patient</div>
+      </div>
+    </div>
+    <a href="{% url 'logout' %}" class="btn-logout">Logout</a>
+  </div>
+</nav>
+
+<div class="container">
+  {% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+    <div class="msg {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="page-header">
+    <h1>👋 Welcome, {{ user.first_name|default:user.username }}!</h1>
+    <p>Your personal health dashboard.</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card blue">
+      <div class="num">{{ total }}</div>
+      <div class="lbl">Total Sessions</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="num">{{ pending }}</div>
+      <div class="lbl">Pending</div>
+    </div>
+    <div class="stat-card green">
+      <div class="num">{{ administered }}</div>
+      <div class="lbl">Administered</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <!-- Medical Profile -->
+    <div class="card">
+      <div class="card-header">🧬 Medical Profile</div>
+      <div class="card-body">
+        <div class="profile-item">
+          <div class="lbl">Full Name</div>
+          <div class="val">{{ user.full_name }}</div>
+        </div>
+        <div class="profile-item">
+          <div class="lbl">Email</div>
+          <div class="val {% if not user.email %}empty{% endif %}">{{ user.email|default:"Not provided" }}</div>
+        </div>
+        <div class="profile-item">
+          <div class="lbl">Date of Birth</div>
+          <div class="val {% if not user.date_of_birth %}empty{% endif %}">{{ user.date_of_birth|default:"Not provided" }}</div>
+        </div>
+        <div class="profile-item">
+          <div class="lbl">Gender</div>
+          <div class="val {% if not user.gender %}empty{% endif %}">{{ user.gender|default:"Not provided"|capfirst }}</div>
+        </div>
+        <div class="profile-item">
+          <div class="lbl">Blood Group</div>
+          <div class="val {% if not user.blood_group %}empty{% endif %}">{{ user.blood_group|default:"Not provided" }}</div>
+        </div>
+        <div class="profile-item">
+          <div class="lbl">Phone</div>
+          <div class="val {% if not user.phone %}empty{% endif %}">{{ user.phone|default:"Not provided" }}</div>
+        </div>
+        <div class="profile-item">
+          <div class="lbl">Address</div>
+          <div class="val {% if not user.address %}empty{% endif %}">{{ user.address|default:"Not provided" }}</div>
+        </div>
+        {% if user.allergies %}
+        <div class="profile-item">
+          <div class="lbl">Allergies</div>
+          <div class="val">{{ user.allergies }}</div>
+        </div>
+        {% endif %}
+        {% if user.medical_conditions %}
+        <div class="profile-item">
+          <div class="lbl">Medical Conditions</div>
+          <div class="val">{{ user.medical_conditions }}</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Medical Records -->
+    <div class="card">
+      <div class="card-header">💊 Medical Records</div>
+      <div class="card-body">
+        {% if sessions %}
+          {% for session in sessions %}
+          <div class="session-card" onclick="toggleSession({{ session.id }}, this)">
+            <div class="session-header">
+              <div>
+                <div class="session-title">
+                  Session #{{ forloop.revcounter }} &nbsp;·&nbsp; {{ session.drug_count }} drug{{ session.drug_count|pluralize }}
+                </div>
+                <div class="session-meta">
+                  Dr. {{ session.doctor.full_name }} &nbsp;·&nbsp; {{ session.created_at|date:"M d, Y" }} at {{ session.created_at|date:"g:i A" }}
+                </div>
+              </div>
+              <div class="session-right">
+                <span class="badge {{ session.status }}">
+                  {% if session.status == 'pending' %}⏳ Pending
+                  {% elif session.status == 'administered' %}✅ Administered
+                  {% else %}❌ Rejected
+                  {% endif %}
+                </span>
+                <span class="chevron" id="chev_{{ session.id }}">▼</span>
+              </div>
+            </div>
+            <div class="session-body" id="body_{{ session.id }}">
+              {% for entry in session.drugs.all %}
+              <div class="drug-row">
+                <span class="drug-icon">💊</span>
+                <span class="drug-name">{{ entry.drug.name }}{% if entry.drug.strength %} – {{ entry.drug.strength }}{% endif %}{% if entry.drug.dosage_form %} ({{ entry.drug.dosage_form }}){% endif %}</span>
+                {% if entry.dosage %}<span class="drug-dosage">{{ entry.dosage }}</span>{% endif %}
+              </div>
+              {% endfor %}
+              {% if session.doctor_note %}
+              <div class="note-box">📋 <strong>Doctor's Note:</strong> {{ session.doctor_note }}</div>
+              {% endif %}
+              {% if session.pharmacist_note %}
+              <div class="note-box pharma">💬 <strong>Pharmacist's Note:</strong> {{ session.pharmacist_note }}</div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <div class="icon">💊</div>
+            <p style="font-weight:600;font-size:1rem;margin-bottom:6px">No records yet</p>
+            <p style="font-size:.875rem">Your drug records will appear here once a doctor prescribes medication.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSession(id, card) {
+  const body = document.getElementById('body_' + id);
+  const chev = document.getElementById('chev_' + id);
+  const open = body.classList.toggle('open');
+  chev.style.transform = open ? 'rotate(180deg)' : '';
+}
+</script>
+</body>
+</html>

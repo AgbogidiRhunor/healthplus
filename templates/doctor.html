@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Health Plus – Doctor Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #8b5cf6; --primary-dark: #7c3aed;
+      --bg: #faf5ff; --surface: #fff; --text: #0f172a;
+      --muted: #64748b; --border: #e2e8f0;
+    }
+    body { background: var(--bg); font-family: 'Segoe UI', system-ui, sans-serif; color: var(--text); min-height: 100vh; }
+    .navbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; box-shadow: 0 1px 8px rgba(139,92,246,.08); position: sticky; top: 0; z-index: 100; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.2rem; color: var(--primary); }
+    .nav-brand svg { width: 32px; height: 32px; }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-user { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--muted); }
+    .avatar { width: 36px; height: 36px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: .9rem; }
+    .btn-logout { padding: 7px 14px; background: transparent; border: 1.5px solid var(--border); border-radius: 8px; font-size: .85rem; color: var(--muted); cursor: pointer; text-decoration: none; transition: all .2s; }
+    .btn-logout:hover { border-color: #ef4444; color: #ef4444; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 { font-size: 1.6rem; font-weight: 800; }
+    .page-header p { color: var(--muted); margin-top: 4px; }
+    .card { background: var(--surface); border-radius: 14px; border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(0,0,0,.04); }
+    .card-header { padding: 18px 24px; border-bottom: 1px solid var(--border); font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .card-body { padding: 24px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .form-label { font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; display: block; }
+
+    /* --- Combo input (search + dropdown) --- */
+    .combo-wrap { position: relative; margin-bottom: 20px; }
+    .combo-input-row { display: flex; gap: 0; border: 2px solid var(--border); border-radius: 10px; overflow: hidden; transition: border-color .2s, box-shadow .2s; background: #f8fafc; }
+    .combo-input-row:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(139,92,246,.12); background: #fff; }
+    .combo-search { flex: 1; padding: 11px 14px; border: none; background: transparent; font-size: .92rem; color: var(--text); outline: none; }
+    .combo-toggle { padding: 11px 14px; background: transparent; border: none; border-left: 1.5px solid var(--border); cursor: pointer; color: var(--muted); font-size: .85rem; transition: background .15s; }
+    .combo-toggle:hover { background: #ede9fe; color: var(--primary); }
+    .combo-dropdown { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border: 1.5px solid var(--border); border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,.1); z-index: 50; max-height: 280px; overflow-y: auto; display: none; }
+    .combo-dropdown.open { display: block; }
+    .combo-item { padding: 11px 16px; cursor: pointer; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px; transition: background .15s; }
+    .combo-item:last-child { border-bottom: none; }
+    .combo-item:hover, .combo-item.highlighted { background: #f5f3ff; }
+    .ci-avatar { width: 30px; height: 30px; background: linear-gradient(135deg, #0ea5e9, #06b6d4); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: .78rem; flex-shrink: 0; }
+    .ci-avatar.drug { background: linear-gradient(135deg, #8b5cf6, #7c3aed); font-size: .7rem; }
+    .ci-name { font-weight: 600; font-size: .88rem; }
+    .ci-sub { font-size: .75rem; color: var(--muted); }
+    .combo-empty { padding: 12px 16px; color: var(--muted); font-size: .85rem; text-align: center; }
+
+    /* Selected patient chip */
+    .selected-patient { background: #f5f3ff; border: 2px solid var(--primary); border-radius: 10px; padding: 12px 16px; display: none; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .selected-patient.show { display: flex; }
+    .sp-name { font-weight: 700; font-size: .95rem; color: var(--primary); }
+    .sp-meta { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+    .btn-clear { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.1rem; padding: 4px 6px; margin-left: auto; transition: color .15s; }
+    .btn-clear:hover { color: #ef4444; }
+    .btn-view-profile { font-size: .78rem; padding: 4px 10px; background: #ede9fe; color: var(--primary); border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background .15s; }
+    .btn-view-profile:hover { background: #ddd6fe; }
+
+    /* Selected drugs list */
+    .selected-drugs { border: 1.5px solid var(--border); border-radius: 8px; min-height: 72px; margin-bottom: 14px; background: #fafafa; }
+    .sd-empty { display: flex; align-items: center; justify-content: center; height: 72px; color: var(--muted); font-size: .85rem; }
+    .sd-item { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid #f1f5f9; }
+    .sd-item:last-child { border-bottom: none; }
+    .sd-name { font-weight: 600; font-size: .85rem; flex: 1; }
+    .sd-dosage { padding: 5px 9px; border: 1px solid var(--border); border-radius: 6px; font-size: .82rem; width: 160px; background: #fff; font-family: inherit; }
+    .sd-dosage:focus { outline: none; border-color: var(--primary); }
+    .btn-remove { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1rem; padding: 2px 6px; }
+    .note-area { width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: .9rem; font-family: inherit; resize: vertical; min-height: 80px; background: #f8fafc; transition: all .2s; }
+    .note-area:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(139,92,246,.12); }
+    .btn-submit { padding: 12px 28px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background .2s; }
+    .btn-submit:hover { background: var(--primary-dark); }
+    .btn-submit:disabled { background: #c4b5fd; cursor: not-allowed; }
+    .messages { margin-bottom: 20px; }
+    .msg { padding: 10px 14px; border-radius: 8px; font-size: .875rem; margin-bottom: 8px; }
+    .msg.success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+    .msg.error { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+
+    /* Patient profile modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; z-index: 200; padding: 16px; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: #fff; border-radius: 14px; padding: 28px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .modal-header h3 { font-size: 1.1rem; font-weight: 700; }
+    .btn-modal-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--muted); }
+    .prof-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .prof-item .lbl { font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+    .prof-item .val { font-size: .9rem; font-weight: 500; margin-top: 2px; }
+    .prof-item .val.empty { color: #cbd5e1; font-style: italic; }
+    @media(max-width:640px) { .two-col { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-brand">
+    <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#8b5cf6"/><path d="M13 9h6v4h4v6h-4v4h-6v-4H9v-6h4z" fill="white"/></svg>
+    Health Plus
+  </div>
+  <div class="nav-right">
+    <div class="nav-user">
+      <div class="avatar">{{ user.first_name.0|upper }}{{ user.last_name.0|upper }}</div>
+      <div>
+        <div style="font-weight:600;color:var(--text)">Dr. {{ user.full_name }}</div>
+        <div style="font-size:.78rem">Doctor</div>
+      </div>
+    </div>
+    <a href="{% url 'logout' %}" class="btn-logout">Logout</a>
+  </div>
+</nav>
+
+<div class="container">
+  {% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+    <div class="msg {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="page-header">
+    <h1>👨‍⚕️ Doctor Dashboard</h1>
+    <p>Search for patients and prescribe medications in one session.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header">💊 New Prescription Session</div>
+    <div class="card-body">
+      <form method="post" action="{% url 'administer_drug' %}" id="administerForm">
+        {% csrf_token %}
+        <input type="hidden" name="patient_id" id="selectedPatientId"/>
+
+        <div class="two-col">
+          <!-- LEFT: Patient -->
+          <div>
+            <label class="form-label">Step 1 — Select Patient</label>
+
+            <!-- Combo: search + dropdown arrow -->
+            <div class="combo-wrap" id="patientComboWrap">
+              <div class="combo-input-row">
+                <input type="text" class="combo-search" id="patientSearch" placeholder="Search by name or username…" autocomplete="off"/>
+                <button type="button" class="combo-toggle" id="patientToggle" title="Show all patients">▼ All</button>
+              </div>
+              <div class="combo-dropdown" id="patientDropdown"></div>
+            </div>
+
+            <div class="selected-patient" id="selectedPatient">
+              <div class="ci-avatar" id="spAvatar"></div>
+              <div>
+                <div class="sp-name" id="spName"></div>
+                <div class="sp-meta" id="spMeta"></div>
+              </div>
+              <button type="button" class="btn-view-profile" id="btnViewProfile">View Profile</button>
+              <button type="button" class="btn-clear" id="clearPatient">✕</button>
+            </div>
+          </div>
+
+          <!-- RIGHT: Drugs -->
+          <div>
+            <label class="form-label">Step 2 — Add Drugs</label>
+
+            <div class="combo-wrap" id="drugComboWrap">
+              <div class="combo-input-row">
+                <input type="text" class="combo-search" id="drugSearch" placeholder="Search drugs…" autocomplete="off"/>
+                <button type="button" class="combo-toggle" id="drugToggle" title="Show all drugs">▼ All</button>
+              </div>
+              <div class="combo-dropdown" id="drugDropdown"></div>
+            </div>
+
+            <div class="selected-drugs" id="selectedDrugs">
+              <div class="sd-empty" id="drugsEmpty">No drugs selected yet.</div>
+            </div>
+            <div id="drugInputsContainer"></div>
+          </div>
+        </div>
+
+        <!-- Note -->
+        <label class="form-label" style="margin-top:18px">Step 3 — Pharmacist Note <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea class="note-area" name="doctor_note" placeholder="Explain why these drugs are being administered…"></textarea>
+
+        <div style="margin-top:20px;display:flex;justify-content:flex-end">
+          <button type="submit" class="btn-submit" id="submitBtn" disabled>Create Session →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Patient Profile Modal -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🧬 Patient Profile</h3>
+      <button class="btn-modal-close" onclick="closeProfileModal()">✕</button>
+    </div>
+    <div id="profileModalBody">Loading…</div>
+  </div>
+</div>
+
+<!-- Pass Django data to JS -->
+<script>
+// All patients (alphabetical) from server
+const ALL_PATIENTS = [
+  {% for p in patients %}
+  { id: {{ p.id }}, username: "{{ p.username }}", name: "{{ p.full_name }}", display: "{{ p.full_name }} (@{{ p.username }})",
+    dob: "{{ p.date_of_birth|default:'' }}", gender: "{{ p.gender|default:'' }}", blood: "{{ p.blood_group|default:'' }}",
+    phone: "{{ p.phone|default:'' }}", address: "{{ p.address|default:'' }}", allergies: "{{ p.allergies|default:'' }}", conditions: "{{ p.medical_conditions|default:'' }}" },
+  {% endfor %}
+];
+
+// All drugs (alphabetical) from server
+const ALL_DRUGS = [
+  {% for d in drugs %}
+  { id: {{ d.id }}, name: "{{ d.name }}", strength: "{{ d.strength|default:'' }}", dosage_form: "{{ d.dosage_form|default:'' }}", display: "{{ d }}" },
+  {% endfor %}
+];
+
+// ===== PATIENT COMBO =====
+const patientSearch = document.getElementById('patientSearch');
+const patientDropdown = document.getElementById('patientDropdown');
+const patientToggle = document.getElementById('patientToggle');
+const selectedPatientEl = document.getElementById('selectedPatient');
+const selectedPatientId = document.getElementById('selectedPatientId');
+
+let currentPatient = null;
+let patientDropdownOpen = false;
+
+function renderPatientDropdown(list) {
+  patientDropdown.innerHTML = '';
+  if (!list.length) {
+    patientDropdown.innerHTML = '<div class="combo-empty">No patients found</div>';
+  } else {
+    list.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'combo-item';
+      div.innerHTML = `<div class="ci-avatar">${(p.name[0]||p.username[0]).toUpperCase()}</div>
+        <div><div class="ci-name">${p.name}</div><div class="ci-sub">@${p.username}</div></div>`;
+      div.addEventListener('click', () => selectPatient(p));
+      patientDropdown.appendChild(div);
+    });
+  }
+  patientDropdown.classList.add('open');
+  patientDropdownOpen = true;
+}
+
+function selectPatient(p) {
+  currentPatient = p;
+  selectedPatientId.value = p.id;
+  document.getElementById('spName').textContent = p.name;
+  document.getElementById('spMeta').textContent = `@${p.username}`;
+  document.getElementById('spAvatar').textContent = (p.name[0]||p.username[0]).toUpperCase();
+  selectedPatientEl.classList.add('show');
+  patientDropdown.classList.remove('open');
+  patientSearch.value = '';
+  patientDropdownOpen = false;
+  updateSubmitBtn();
+}
+
+patientSearch.addEventListener('input', () => {
+  const q = patientSearch.value.toLowerCase().trim();
+  if (!q) { patientDropdown.classList.remove('open'); return; }
+  const filtered = ALL_PATIENTS.filter(p => p.name.toLowerCase().includes(q) || p.username.toLowerCase().includes(q));
+  renderPatientDropdown(filtered);
+});
+
+patientToggle.addEventListener('click', () => {
+  if (patientDropdownOpen) { patientDropdown.classList.remove('open'); patientDropdownOpen = false; }
+  else { renderPatientDropdown(ALL_PATIENTS); }
+});
+
+document.getElementById('clearPatient').addEventListener('click', () => {
+  currentPatient = null;
+  selectedPatientId.value = '';
+  selectedPatientEl.classList.remove('show');
+  updateSubmitBtn();
+});
+
+// ===== DRUG COMBO =====
+const drugSearch = document.getElementById('drugSearch');
+const drugDropdown = document.getElementById('drugDropdown');
+const drugToggle = document.getElementById('drugToggle');
+const selectedDrugsEl = document.getElementById('selectedDrugs');
+const drugsEmpty = document.getElementById('drugsEmpty');
+const drugInputsContainer = document.getElementById('drugInputsContainer');
+
+let selectedDrugs = [];
+let drugDropdownOpen = false;
+
+function renderDrugDropdown(list) {
+  drugDropdown.innerHTML = '';
+  if (!list.length) {
+    drugDropdown.innerHTML = '<div class="combo-empty">No drugs found</div>';
+  } else {
+    list.forEach(d => {
+      const isAdded = selectedDrugs.find(x => x.id === d.id);
+      const div = document.createElement('div');
+      div.className = 'combo-item';
+      div.style.opacity = isAdded ? '.5' : '1';
+      div.innerHTML = `<div class="ci-avatar drug">💊</div>
+        <div style="flex:1"><div class="ci-name">${d.name}</div><div class="ci-sub">${d.strength||''} ${d.dosage_form||''}</div></div>
+        ${isAdded ? '<span style="font-size:.75rem;color:#10b981;font-weight:700">Added</span>' : '<span style="font-size:.75rem;color:var(--primary);font-weight:700">+ Add</span>'}`;
+      if (!isAdded) div.addEventListener('click', () => { addDrug(d); renderDrugDropdown(list); });
+      drugDropdown.appendChild(div);
+    });
+  }
+  drugDropdown.classList.add('open');
+  drugDropdownOpen = true;
+}
+
+function addDrug(d) {
+  if (selectedDrugs.find(x => x.id === d.id)) return;
+  selectedDrugs.push(d);
+  renderSelectedDrugs();
+  updateSubmitBtn();
+}
+
+function removeDrug(id) {
+  selectedDrugs = selectedDrugs.filter(d => d.id !== id);
+  renderSelectedDrugs();
+  updateSubmitBtn();
+}
+
+function renderSelectedDrugs() {
+  selectedDrugsEl.querySelectorAll('.sd-item').forEach(i => i.remove());
+  drugInputsContainer.innerHTML = '';
+  if (!selectedDrugs.length) { drugsEmpty.style.display = 'flex'; return; }
+  drugsEmpty.style.display = 'none';
+  selectedDrugs.forEach(d => {
+    const div = document.createElement('div');
+    div.className = 'sd-item';
+    div.innerHTML = `<span class="sd-name">💊 ${d.name}${d.strength ? ' – '+d.strength : ''}</span>
+      <input type="text" class="sd-dosage" placeholder="Dosage (e.g. 2x daily)" data-id="${d.id}"/>
+      <button type="button" class="btn-remove" onclick="removeDrug(${d.id})">✕</button>`;
+    selectedDrugsEl.appendChild(div);
+    const hId = document.createElement('input'); hId.type='hidden'; hId.name='drug_ids'; hId.value=d.id;
+    const hDos = document.createElement('input'); hDos.type='hidden'; hDos.name='dosages'; hDos.id=`dos_${d.id}`; hDos.value='';
+    drugInputsContainer.appendChild(hId);
+    drugInputsContainer.appendChild(hDos);
+  });
+  selectedDrugsEl.querySelectorAll('.sd-dosage').forEach(inp => {
+    inp.addEventListener('input', () => { document.getElementById(`dos_${inp.dataset.id}`).value = inp.value; });
+  });
+}
+
+drugSearch.addEventListener('input', () => {
+  const q = drugSearch.value.toLowerCase().trim();
+  if (!q) { drugDropdown.classList.remove('open'); return; }
+  const filtered = ALL_DRUGS.filter(d => d.name.toLowerCase().includes(q));
+  renderDrugDropdown(filtered);
+});
+
+drugToggle.addEventListener('click', () => {
+  if (drugDropdownOpen) { drugDropdown.classList.remove('open'); drugDropdownOpen = false; }
+  else { renderDrugDropdown(ALL_DRUGS); }
+});
+
+// Close dropdowns on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('#patientComboWrap')) { patientDropdown.classList.remove('open'); patientDropdownOpen = false; }
+  if (!e.target.closest('#drugComboWrap')) { drugDropdown.classList.remove('open'); drugDropdownOpen = false; }
+  if (!e.target.closest('#profileModal') && !e.target.closest('#btnViewProfile')) closeProfileModal();
+});
+
+function updateSubmitBtn() {
+  document.getElementById('submitBtn').disabled = !(selectedPatientId.value && selectedDrugs.length > 0);
+}
+
+// ===== PATIENT PROFILE MODAL =====
+document.getElementById('btnViewProfile').addEventListener('click', e => {
+  e.stopPropagation();
+  if (!currentPatient) return;
+  const p = currentPatient;
+  const rows = [
+    ['Full Name', p.name], ['Username', '@' + p.username],
+    ['Date of Birth', p.dob || '—'], ['Gender', p.gender || '—'],
+    ['Blood Group', p.blood || '—'], ['Phone', p.phone || '—'],
+    ['Address', p.address || '—', true], ['Allergies', p.allergies || '—', true],
+    ['Medical Conditions', p.conditions || '—', true],
+  ];
+  let html = '<div class="prof-grid">';
+  rows.forEach(([lbl, val, full]) => {
+    const isEmpty = !val || val === '—';
+    html += `<div class="prof-item${full ? '" style="grid-column:span 2' : ''}">
+      <div class="lbl">${lbl}</div>
+      <div class="val${isEmpty ? ' empty' : ''}">${val}</div>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('profileModalBody').innerHTML = html;
+  document.getElementById('profileModal').classList.add('show');
+});
+
+function closeProfileModal() {
+  document.getElementById('profileModal').classList.remove('show');
+}
+</script>
+</body>
+</html>
