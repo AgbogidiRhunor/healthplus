@@ -30,35 +30,39 @@
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
     .form-label { font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; display: block; }
 
-    /* --- Combo input (search + dropdown) --- */
+    /* Combo */
     .combo-wrap { position: relative; margin-bottom: 20px; }
-    .combo-input-row { display: flex; gap: 0; border: 2px solid var(--border); border-radius: 10px; overflow: hidden; transition: border-color .2s, box-shadow .2s; background: #f8fafc; }
+    .combo-input-row { display: flex; border: 2px solid var(--border); border-radius: 10px; overflow: hidden; transition: border-color .2s, box-shadow .2s; background: #f8fafc; }
     .combo-input-row:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(139,92,246,.12); background: #fff; }
     .combo-search { flex: 1; padding: 11px 14px; border: none; background: transparent; font-size: .92rem; color: var(--text); outline: none; }
-    .combo-toggle { padding: 11px 14px; background: transparent; border: none; border-left: 1.5px solid var(--border); cursor: pointer; color: var(--muted); font-size: .85rem; transition: background .15s; }
+    .combo-toggle { padding: 11px 14px; background: transparent; border: none; border-left: 1.5px solid var(--border); cursor: pointer; color: var(--muted); font-size: .85rem; transition: background .15s; white-space: nowrap; }
     .combo-toggle:hover { background: #ede9fe; color: var(--primary); }
     .combo-dropdown { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border: 1.5px solid var(--border); border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,.1); z-index: 50; max-height: 280px; overflow-y: auto; display: none; }
     .combo-dropdown.open { display: block; }
     .combo-item { padding: 11px 16px; cursor: pointer; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px; transition: background .15s; }
     .combo-item:last-child { border-bottom: none; }
-    .combo-item:hover, .combo-item.highlighted { background: #f5f3ff; }
+    .combo-item:hover { background: #f5f3ff; }
     .ci-avatar { width: 30px; height: 30px; background: linear-gradient(135deg, #0ea5e9, #06b6d4); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: .78rem; flex-shrink: 0; }
-    .ci-avatar.drug { background: linear-gradient(135deg, #8b5cf6, #7c3aed); font-size: .7rem; }
+    .ci-avatar.drug { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
     .ci-name { font-weight: 600; font-size: .88rem; }
     .ci-sub { font-size: .75rem; color: var(--muted); }
     .combo-empty { padding: 12px 16px; color: var(--muted); font-size: .85rem; text-align: center; }
 
     /* Selected patient chip */
-    .selected-patient { background: #f5f3ff; border: 2px solid var(--primary); border-radius: 10px; padding: 12px 16px; display: none; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .selected-patient { background: #f5f3ff; border: 2px solid var(--primary); border-radius: 10px; padding: 12px 16px; display: none; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
     .selected-patient.show { display: flex; }
     .sp-name { font-weight: 700; font-size: .95rem; color: var(--primary); }
     .sp-meta { font-size: .78rem; color: var(--muted); margin-top: 2px; }
-    .btn-clear { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.1rem; padding: 4px 6px; margin-left: auto; transition: color .15s; }
+    .sp-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+    .btn-chip { font-size: .75rem; padding: 5px 11px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background .15s; }
+    .btn-chip.profile { background: #ede9fe; color: var(--primary); }
+    .btn-chip.profile:hover { background: #ddd6fe; }
+    .btn-chip.records { background: #e0f2fe; color: #0284c7; }
+    .btn-chip.records:hover { background: #bae6fd; }
+    .btn-clear { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.1rem; padding: 4px; transition: color .15s; }
     .btn-clear:hover { color: #ef4444; }
-    .btn-view-profile { font-size: .78rem; padding: 4px 10px; background: #ede9fe; color: var(--primary); border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background .15s; }
-    .btn-view-profile:hover { background: #ddd6fe; }
 
-    /* Selected drugs list */
+    /* Drug selection */
     .selected-drugs { border: 1.5px solid var(--border); border-radius: 8px; min-height: 72px; margin-bottom: 14px; background: #fafafa; }
     .sd-empty { display: flex; align-items: center; justify-content: center; height: 72px; color: var(--muted); font-size: .85rem; }
     .sd-item { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid #f1f5f9; }
@@ -77,18 +81,47 @@
     .msg.success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
     .msg.error { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
 
-    /* Patient profile modal */
+    /* Modal */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; z-index: 200; padding: 16px; }
     .modal-overlay.show { display: flex; }
-    .modal { background: #fff; border-radius: 14px; padding: 28px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
-    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-    .modal-header h3 { font-size: 1.1rem; font-weight: 700; }
+    .modal { background: #fff; border-radius: 16px; width: 100%; max-width: 560px; max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; }
+    .modal-header { padding: 20px 24px 0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .modal-header h3 { font-size: 1.1rem; font-weight: 800; }
     .btn-modal-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--muted); }
+    .modal-tabs { display: flex; gap: 4px; padding: 14px 24px 0; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .modal-tab { padding: 8px 16px; border-radius: 8px 8px 0 0; font-size: .88rem; font-weight: 600; cursor: pointer; color: var(--muted); border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; }
+    .modal-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+    .modal-tab-content { display: none; }
+    .modal-tab-content.active { display: block; }
+
+    /* Profile grid inside modal */
     .prof-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .prof-item .lbl { font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
     .prof-item .val { font-size: .9rem; font-weight: 500; margin-top: 2px; }
     .prof-item .val.empty { color: #cbd5e1; font-style: italic; }
-    @media(max-width:640px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* Records inside modal */
+    .rec-session { border: 1.5px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+    .rec-session-hdr { padding: 11px 14px; background: #fafafa; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; }
+    .rec-session-hdr:hover { background: #f5f3ff; }
+    .rec-s-title { font-weight: 700; font-size: .88rem; }
+    .rec-s-meta { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+    .rec-session-body { display: none; border-top: 1px solid var(--border); padding: 10px 14px; background: #f8fafc; }
+    .rec-session-body.open { display: block; }
+    .rec-drug-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #f1f5f9; font-size: .85rem; }
+    .rec-drug-row:last-child { border-bottom: none; }
+    .rec-drug-name { flex: 1; font-weight: 600; }
+    .rec-drug-dosage { font-size: .75rem; color: var(--muted); background: #f1f5f9; padding: 1px 7px; border-radius: 4px; }
+    .rec-note { border-radius: 7px; padding: 8px 11px; font-size: .8rem; margin-top: 8px; }
+    .rec-note.doc { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .rec-note.pharma { background: #f0fdf4; border: 1px solid #86efac; color: #166534; }
+    .badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 9px; border-radius: 999px; font-size: .72rem; font-weight: 700; white-space: nowrap; }
+    .badge.pending { background: #fef9c3; color: #92400e; }
+    .badge.administered { background: #d1fae5; color: #065f46; }
+    .badge.rejected { background: #fee2e2; color: #b91c1c; }
+    .loading { text-align: center; padding: 32px; color: var(--muted); }
+    @media(max-width:640px) { .two-col { grid-template-columns: 1fr; } .prof-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -132,42 +165,40 @@
         <input type="hidden" name="patient_id" id="selectedPatientId"/>
 
         <div class="two-col">
-          <!-- LEFT: Patient -->
+          <!-- Patient -->
           <div>
             <label class="form-label">Step 1 — Select Patient</label>
-
-            <!-- Combo: search + dropdown arrow -->
             <div class="combo-wrap" id="patientComboWrap">
               <div class="combo-input-row">
                 <input type="text" class="combo-search" id="patientSearch" placeholder="Search by name or username…" autocomplete="off"/>
-                <button type="button" class="combo-toggle" id="patientToggle" title="Show all patients">▼ All</button>
+                <button type="button" class="combo-toggle" id="patientToggle">▼ All</button>
               </div>
               <div class="combo-dropdown" id="patientDropdown"></div>
             </div>
-
             <div class="selected-patient" id="selectedPatient">
               <div class="ci-avatar" id="spAvatar"></div>
               <div>
                 <div class="sp-name" id="spName"></div>
                 <div class="sp-meta" id="spMeta"></div>
               </div>
-              <button type="button" class="btn-view-profile" id="btnViewProfile">View Profile</button>
-              <button type="button" class="btn-clear" id="clearPatient">✕</button>
+              <div class="sp-actions">
+                <button type="button" class="btn-chip profile" id="btnViewProfile">🧬 Profile</button>
+                <button type="button" class="btn-chip records" id="btnViewRecords">📋 Records</button>
+                <button type="button" class="btn-clear" id="clearPatient">✕</button>
+              </div>
             </div>
           </div>
 
-          <!-- RIGHT: Drugs -->
+          <!-- Drugs -->
           <div>
             <label class="form-label">Step 2 — Add Drugs</label>
-
             <div class="combo-wrap" id="drugComboWrap">
               <div class="combo-input-row">
                 <input type="text" class="combo-search" id="drugSearch" placeholder="Search drugs…" autocomplete="off"/>
-                <button type="button" class="combo-toggle" id="drugToggle" title="Show all drugs">▼ All</button>
+                <button type="button" class="combo-toggle" id="drugToggle">▼ All</button>
               </div>
               <div class="combo-dropdown" id="drugDropdown"></div>
             </div>
-
             <div class="selected-drugs" id="selectedDrugs">
               <div class="sd-empty" id="drugsEmpty">No drugs selected yet.</div>
             </div>
@@ -175,7 +206,6 @@
           </div>
         </div>
 
-        <!-- Note -->
         <label class="form-label" style="margin-top:18px">Step 3 — Pharmacist Note <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
         <textarea class="note-area" name="doctor_note" placeholder="Explain why these drugs are being administered…"></textarea>
 
@@ -187,138 +217,128 @@
   </div>
 </div>
 
-<!-- Patient Profile Modal -->
-<div class="modal-overlay" id="profileModal">
+<!-- Patient Modal: Profile + Records tabs -->
+<div class="modal-overlay" id="patientModal">
   <div class="modal">
     <div class="modal-header">
-      <h3>🧬 Patient Profile</h3>
-      <button class="btn-modal-close" onclick="closeProfileModal()">✕</button>
+      <h3 id="modalPatientName">Patient</h3>
+      <button class="btn-modal-close" onclick="closeModal()">✕</button>
     </div>
-    <div id="profileModalBody">Loading…</div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tabBtnProfile" onclick="switchModalTab('profile')">🧬 Profile</button>
+      <button class="modal-tab" id="tabBtnRecords" onclick="switchModalTab('records')">📋 Medical Records</button>
+    </div>
+    <div class="modal-body">
+      <!-- Profile tab -->
+      <div class="modal-tab-content active" id="tabProfile">
+        <div class="prof-grid" id="profileGrid"></div>
+      </div>
+      <!-- Records tab -->
+      <div class="modal-tab-content" id="tabRecords">
+        <div id="recordsContent"><div class="loading">Loading records…</div></div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- Pass Django data to JS -->
 <script>
-// All patients (alphabetical) from server
 const ALL_PATIENTS = [
   {% for p in patients %}
-  { id: {{ p.id }}, username: "{{ p.username }}", name: "{{ p.full_name }}", display: "{{ p.full_name }} (@{{ p.username }})",
-    dob: "{{ p.date_of_birth|default:'' }}", gender: "{{ p.gender|default:'' }}", blood: "{{ p.blood_group|default:'' }}",
-    phone: "{{ p.phone|default:'' }}", address: "{{ p.address|default:'' }}", allergies: "{{ p.allergies|default:'' }}", conditions: "{{ p.medical_conditions|default:'' }}" },
+  { id: {{ p.id }}, username: "{{ p.username }}", name: "{{ p.full_name|escapejs }}",
+    dob: "{{ p.date_of_birth|default:'' }}", gender: "{{ p.gender|default:''|capfirst }}", blood: "{{ p.blood_group|default:'' }}",
+    phone: "{{ p.phone|default:'' }}", address: "{{ p.address|default:''|escapejs }}", allergies: "{{ p.allergies|default:''|escapejs }}", conditions: "{{ p.medical_conditions|default:''|escapejs }}" },
   {% endfor %}
 ];
 
-// All drugs (alphabetical) from server
 const ALL_DRUGS = [
   {% for d in drugs %}
-  { id: {{ d.id }}, name: "{{ d.name }}", strength: "{{ d.strength|default:'' }}", dosage_form: "{{ d.dosage_form|default:'' }}", display: "{{ d }}" },
+  { id: {{ d.id }}, name: "{{ d.name|escapejs }}", strength: "{{ d.strength|default:'' }}", dosage_form: "{{ d.dosage_form|default:'' }}" },
   {% endfor %}
 ];
 
 // ===== PATIENT COMBO =====
 const patientSearch = document.getElementById('patientSearch');
 const patientDropdown = document.getElementById('patientDropdown');
-const patientToggle = document.getElementById('patientToggle');
 const selectedPatientEl = document.getElementById('selectedPatient');
 const selectedPatientId = document.getElementById('selectedPatientId');
-
 let currentPatient = null;
-let patientDropdownOpen = false;
+let patientDDOpen = false;
 
 function renderPatientDropdown(list) {
-  patientDropdown.innerHTML = '';
-  if (!list.length) {
-    patientDropdown.innerHTML = '<div class="combo-empty">No patients found</div>';
-  } else {
-    list.forEach(p => {
-      const div = document.createElement('div');
-      div.className = 'combo-item';
-      div.innerHTML = `<div class="ci-avatar">${(p.name[0]||p.username[0]).toUpperCase()}</div>
-        <div><div class="ci-name">${p.name}</div><div class="ci-sub">@${p.username}</div></div>`;
-      div.addEventListener('click', () => selectPatient(p));
-      patientDropdown.appendChild(div);
-    });
-  }
-  patientDropdown.classList.add('open');
-  patientDropdownOpen = true;
+  patientDropdown.innerHTML = list.length
+    ? list.map(p => `<div class="combo-item" onclick="selectPatient(${p.id})">
+        <div class="ci-avatar">${(p.name[0]||p.username[0]).toUpperCase()}</div>
+        <div><div class="ci-name">${p.name}</div><div class="ci-sub">@${p.username}</div></div>
+      </div>`).join('')
+    : '<div class="combo-empty">No patients found</div>';
+  patientDropdown.classList.add('open'); patientDDOpen = true;
 }
 
-function selectPatient(p) {
+function selectPatient(id) {
+  const p = ALL_PATIENTS.find(x => x.id === id);
+  if (!p) return;
   currentPatient = p;
   selectedPatientId.value = p.id;
   document.getElementById('spName').textContent = p.name;
-  document.getElementById('spMeta').textContent = `@${p.username}`;
+  document.getElementById('spMeta').textContent = '@' + p.username;
   document.getElementById('spAvatar').textContent = (p.name[0]||p.username[0]).toUpperCase();
   selectedPatientEl.classList.add('show');
-  patientDropdown.classList.remove('open');
+  patientDropdown.classList.remove('open'); patientDDOpen = false;
   patientSearch.value = '';
-  patientDropdownOpen = false;
   updateSubmitBtn();
 }
 
 patientSearch.addEventListener('input', () => {
   const q = patientSearch.value.toLowerCase().trim();
   if (!q) { patientDropdown.classList.remove('open'); return; }
-  const filtered = ALL_PATIENTS.filter(p => p.name.toLowerCase().includes(q) || p.username.toLowerCase().includes(q));
-  renderPatientDropdown(filtered);
+  renderPatientDropdown(ALL_PATIENTS.filter(p => p.name.toLowerCase().includes(q) || p.username.toLowerCase().includes(q)));
 });
 
-patientToggle.addEventListener('click', () => {
-  if (patientDropdownOpen) { patientDropdown.classList.remove('open'); patientDropdownOpen = false; }
-  else { renderPatientDropdown(ALL_PATIENTS); }
+document.getElementById('patientToggle').addEventListener('click', () => {
+  patientDDOpen ? (patientDropdown.classList.remove('open'), patientDDOpen = false) : renderPatientDropdown(ALL_PATIENTS);
 });
 
 document.getElementById('clearPatient').addEventListener('click', () => {
-  currentPatient = null;
-  selectedPatientId.value = '';
-  selectedPatientEl.classList.remove('show');
-  updateSubmitBtn();
+  currentPatient = null; selectedPatientId.value = '';
+  selectedPatientEl.classList.remove('show'); updateSubmitBtn();
 });
 
 // ===== DRUG COMBO =====
 const drugSearch = document.getElementById('drugSearch');
 const drugDropdown = document.getElementById('drugDropdown');
-const drugToggle = document.getElementById('drugToggle');
 const selectedDrugsEl = document.getElementById('selectedDrugs');
 const drugsEmpty = document.getElementById('drugsEmpty');
 const drugInputsContainer = document.getElementById('drugInputsContainer');
-
 let selectedDrugs = [];
-let drugDropdownOpen = false;
+let drugDDOpen = false;
 
 function renderDrugDropdown(list) {
-  drugDropdown.innerHTML = '';
-  if (!list.length) {
-    drugDropdown.innerHTML = '<div class="combo-empty">No drugs found</div>';
-  } else {
-    list.forEach(d => {
-      const isAdded = selectedDrugs.find(x => x.id === d.id);
-      const div = document.createElement('div');
-      div.className = 'combo-item';
-      div.style.opacity = isAdded ? '.5' : '1';
-      div.innerHTML = `<div class="ci-avatar drug">💊</div>
-        <div style="flex:1"><div class="ci-name">${d.name}</div><div class="ci-sub">${d.strength||''} ${d.dosage_form||''}</div></div>
-        ${isAdded ? '<span style="font-size:.75rem;color:#10b981;font-weight:700">Added</span>' : '<span style="font-size:.75rem;color:var(--primary);font-weight:700">+ Add</span>'}`;
-      if (!isAdded) div.addEventListener('click', () => { addDrug(d); renderDrugDropdown(list); });
-      drugDropdown.appendChild(div);
-    });
-  }
-  drugDropdown.classList.add('open');
-  drugDropdownOpen = true;
+  drugDropdown.innerHTML = list.length
+    ? list.map(d => {
+        const added = selectedDrugs.find(x => x.id === d.id);
+        return `<div class="combo-item" style="opacity:${added?.id ? .5 : 1}" onclick="${added ? '' : `addDrug(${d.id})`}">
+          <div class="ci-avatar drug">💊</div>
+          <div style="flex:1"><div class="ci-name">${d.name}</div><div class="ci-sub">${d.strength||''} ${d.dosage_form||''}</div></div>
+          <span style="font-size:.72rem;font-weight:700;color:${added ? '#10b981' : 'var(--primary)'}">${added ? 'Added' : '+ Add'}</span>
+        </div>`;
+      }).join('')
+    : '<div class="combo-empty">No drugs found</div>';
+  drugDropdown.classList.add('open'); drugDDOpen = true;
 }
 
-function addDrug(d) {
-  if (selectedDrugs.find(x => x.id === d.id)) return;
+function addDrug(id) {
+  const d = ALL_DRUGS.find(x => x.id === id);
+  if (!d || selectedDrugs.find(x => x.id === id)) return;
   selectedDrugs.push(d);
-  renderSelectedDrugs();
-  updateSubmitBtn();
+  renderSelectedDrugs(); updateSubmitBtn();
+  // Refresh dropdown to mark as added
+  const q = drugSearch.value.toLowerCase().trim();
+  renderDrugDropdown(q ? ALL_DRUGS.filter(x => x.name.toLowerCase().includes(q)) : ALL_DRUGS);
 }
 
 function removeDrug(id) {
   selectedDrugs = selectedDrugs.filter(d => d.id !== id);
-  renderSelectedDrugs();
-  updateSubmitBtn();
+  renderSelectedDrugs(); updateSubmitBtn();
 }
 
 function renderSelectedDrugs() {
@@ -327,16 +347,14 @@ function renderSelectedDrugs() {
   if (!selectedDrugs.length) { drugsEmpty.style.display = 'flex'; return; }
   drugsEmpty.style.display = 'none';
   selectedDrugs.forEach(d => {
-    const div = document.createElement('div');
-    div.className = 'sd-item';
+    const div = document.createElement('div'); div.className = 'sd-item';
     div.innerHTML = `<span class="sd-name">💊 ${d.name}${d.strength ? ' – '+d.strength : ''}</span>
       <input type="text" class="sd-dosage" placeholder="Dosage (e.g. 2x daily)" data-id="${d.id}"/>
       <button type="button" class="btn-remove" onclick="removeDrug(${d.id})">✕</button>`;
     selectedDrugsEl.appendChild(div);
     const hId = document.createElement('input'); hId.type='hidden'; hId.name='drug_ids'; hId.value=d.id;
     const hDos = document.createElement('input'); hDos.type='hidden'; hDos.name='dosages'; hDos.id=`dos_${d.id}`; hDos.value='';
-    drugInputsContainer.appendChild(hId);
-    drugInputsContainer.appendChild(hDos);
+    drugInputsContainer.appendChild(hId); drugInputsContainer.appendChild(hDos);
   });
   selectedDrugsEl.querySelectorAll('.sd-dosage').forEach(inp => {
     inp.addEventListener('input', () => { document.getElementById(`dos_${inp.dataset.id}`).value = inp.value; });
@@ -346,54 +364,112 @@ function renderSelectedDrugs() {
 drugSearch.addEventListener('input', () => {
   const q = drugSearch.value.toLowerCase().trim();
   if (!q) { drugDropdown.classList.remove('open'); return; }
-  const filtered = ALL_DRUGS.filter(d => d.name.toLowerCase().includes(q));
-  renderDrugDropdown(filtered);
+  renderDrugDropdown(ALL_DRUGS.filter(d => d.name.toLowerCase().includes(q)));
 });
 
-drugToggle.addEventListener('click', () => {
-  if (drugDropdownOpen) { drugDropdown.classList.remove('open'); drugDropdownOpen = false; }
-  else { renderDrugDropdown(ALL_DRUGS); }
+document.getElementById('drugToggle').addEventListener('click', () => {
+  drugDDOpen ? (drugDropdown.classList.remove('open'), drugDDOpen = false) : renderDrugDropdown(ALL_DRUGS);
 });
 
-// Close dropdowns on outside click
 document.addEventListener('click', e => {
-  if (!e.target.closest('#patientComboWrap')) { patientDropdown.classList.remove('open'); patientDropdownOpen = false; }
-  if (!e.target.closest('#drugComboWrap')) { drugDropdown.classList.remove('open'); drugDropdownOpen = false; }
-  if (!e.target.closest('#profileModal') && !e.target.closest('#btnViewProfile')) closeProfileModal();
+  if (!e.target.closest('#patientComboWrap')) { patientDropdown.classList.remove('open'); patientDDOpen = false; }
+  if (!e.target.closest('#drugComboWrap')) { drugDropdown.classList.remove('open'); drugDDOpen = false; }
+  if (e.target === document.getElementById('patientModal')) closeModal();
 });
 
 function updateSubmitBtn() {
   document.getElementById('submitBtn').disabled = !(selectedPatientId.value && selectedDrugs.length > 0);
 }
 
-// ===== PATIENT PROFILE MODAL =====
-document.getElementById('btnViewProfile').addEventListener('click', e => {
-  e.stopPropagation();
+// ===== PATIENT MODAL =====
+let recordsLoaded = false;
+
+function openModal(startTab) {
   if (!currentPatient) return;
+  document.getElementById('modalPatientName').textContent = currentPatient.name;
+  document.getElementById('patientModal').classList.add('show');
+  switchModalTab(startTab || 'profile');
+}
+
+function closeModal() {
+  document.getElementById('patientModal').classList.remove('show');
+  recordsLoaded = false;
+}
+
+function switchModalTab(tab) {
+  document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.modal-tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tabBtn' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  if (tab === 'records') loadRecords();
+  if (tab === 'profile') renderProfile();
+}
+
+function renderProfile() {
   const p = currentPatient;
   const rows = [
     ['Full Name', p.name], ['Username', '@' + p.username],
     ['Date of Birth', p.dob || '—'], ['Gender', p.gender || '—'],
     ['Blood Group', p.blood || '—'], ['Phone', p.phone || '—'],
-    ['Address', p.address || '—', true], ['Allergies', p.allergies || '—', true],
+    ['Address', p.address || '—', true],
+    ['Allergies', p.allergies || '—', true],
     ['Medical Conditions', p.conditions || '—', true],
   ];
-  let html = '<div class="prof-grid">';
-  rows.forEach(([lbl, val, full]) => {
-    const isEmpty = !val || val === '—';
-    html += `<div class="prof-item${full ? '" style="grid-column:span 2' : ''}">
+  document.getElementById('profileGrid').innerHTML = rows.map(([lbl, val, full]) => {
+    const empty = !val || val === '—';
+    return `<div class="prof-item" style="${full ? 'grid-column:span 2' : ''}">
       <div class="lbl">${lbl}</div>
-      <div class="val${isEmpty ? ' empty' : ''}">${val}</div>
+      <div class="val${empty ? ' empty' : ''}">${val}</div>
     </div>`;
-  });
-  html += '</div>';
-  document.getElementById('profileModalBody').innerHTML = html;
-  document.getElementById('profileModal').classList.add('show');
-});
-
-function closeProfileModal() {
-  document.getElementById('profileModal').classList.remove('show');
+  }).join('');
 }
+
+async function loadRecords() {
+  if (recordsLoaded) return;
+  const el = document.getElementById('recordsContent');
+  el.innerHTML = '<div class="loading">Loading…</div>';
+  try {
+    const res = await fetch(`/records/api/patient/${currentPatient.id}/records/`);
+    const data = await res.json();
+    if (!data.sessions.length) {
+      el.innerHTML = '<div class="loading">No records found for this patient.</div>';
+      return;
+    }
+    el.innerHTML = data.sessions.map((s, i) => {
+      const statusMap = { pending: '⏳ Pending', administered: '✅ Administered', rejected: '❌ Rejected' };
+      const badgeClass = s.status;
+      const drugs = s.drugs.map(d =>
+        `<div class="rec-drug-row">
+          <span>💊</span>
+          <span class="rec-drug-name">${d.name}${d.strength ? ' – '+d.strength : ''}${d.dosage_form ? ' ('+d.dosage_form+')' : ''}</span>
+          ${d.dosage ? `<span class="rec-drug-dosage">${d.dosage}</span>` : ''}
+        </div>`).join('');
+      const notes = (s.doctor_note ? `<div class="rec-note doc">📋 <strong>Doctor's Note:</strong> ${s.doctor_note}</div>` : '') +
+                    (s.pharmacist_note ? `<div class="rec-note pharma">💬 <strong>Pharmacist's Note:</strong> ${s.pharmacist_note}</div>` : '');
+      return `<div class="rec-session">
+        <div class="rec-session-hdr" onclick="toggleRecSession(${i})">
+          <div>
+            <div class="rec-s-title">Session #${s.session_num} &nbsp;·&nbsp; ${s.drugs.length} drug${s.drugs.length !== 1 ? 's' : ''}</div>
+            <div class="rec-s-meta">Dr. ${s.doctor} &nbsp;·&nbsp; ${s.date} at ${s.time}</div>
+          </div>
+          <span class="badge ${badgeClass}">${statusMap[s.status]}</span>
+        </div>
+        <div class="rec-session-body" id="rsb_${i}">${drugs}${notes}</div>
+      </div>`;
+    }).join('');
+    recordsLoaded = true;
+  } catch(e) {
+    el.innerHTML = '<div class="loading">Failed to load records.</div>';
+  }
+}
+
+function toggleRecSession(i) {
+  const el = document.getElementById('rsb_' + i);
+  el.classList.toggle('open');
+}
+
+document.getElementById('btnViewProfile').addEventListener('click', e => { e.stopPropagation(); openModal('profile'); });
+document.getElementById('btnViewRecords').addEventListener('click', e => { e.stopPropagation(); openModal('records'); });
 </script>
 </body>
 </html>
